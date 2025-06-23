@@ -14,7 +14,7 @@ const server = http.createServer((req, res) => {
 
 // Store the current LED state
 let ledState = false;
-
+let pinState = false;
 // Track connected ESP32 devices
 const connectedDevices = new Map();
 
@@ -82,6 +82,15 @@ io.on('connection', (socket) => {
       ledState = state;
       // Broadcast the updated state to all clients
       io.emit('ledState', ledState);
+    }
+  });
+
+  socket.on('pinStatus', (state) => {
+    console.log('pin status update from device:', state);
+    if (pinState !== state) {
+      pinState = state;
+      // Broadcast the updated state to all clients
+      io.emit('pinState', pinState);
     }
   });
   
