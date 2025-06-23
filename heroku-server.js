@@ -15,6 +15,9 @@ const server = http.createServer((req, res) => {
 // Store the current LED state
 let ledState = false;
 
+// Track connected ESP32 devices
+const connectedDevices = new Map();
+
 // Use the port provided by Heroku
 const PORT = process.env.PORT || 3001;
 
@@ -34,6 +37,36 @@ io.on('connection', (socket) => {
   // Send current LED state to newly connected client
   socket.emit('ledState', ledState);
   
+  // Send current connected devices to newly connected client
+  socket.emit('connectedDevices', Array.from(connectedDevices.values()));
+  
+  // Handle ESP32 device registration with custom ID
+  socket.on('registerDevice', (deviceInfo) => {
+    const { deviceId, deviceType = 'ESP32' } = deviceInfo;
+    console.log('Device registered:', deviceId, deviceType);
+    
+    // Store the device with its details
+    connectedDevices.set(socket.id, {
+      socketId: socket.id,
+      deviceId,
+      deviceType,
+      lastSeen: new Date().toISOString(),
+      connected: true
+    });
+    
+    // Broadcast the updated device list to all clients
+    io.emit('deviceUpdate', Array.from(connectedDevices.values()));
+  });
+  
+  // Handle device heartbeat/ping
+  socket.on('deviceHeartbeat', (deviceId) => {
+    if (connectedDevices.has(socket.id)) {
+      const device = connectedDevices.get(socket.id);
+      device.lastSeen = new Date().toISOString();
+      connectedDevices.set(socket.id, device);
+    }
+  });
+
   // Handle LED toggle from web client
   socket.on('toggleLED', (state) => {
     console.log('LED state toggled to:', state);
@@ -54,6 +87,26 @@ io.on('connection', (socket) => {
   
   socket.on('disconnect', () => {
     console.log('Client disconnected:', socket.id);
+    
+    // If the disconnected socket is a registered device, update its status
+    if (connectedDevices.has(socket.id)) {
+      const device = connectedDevices.get(socket.id);
+      device.connected = false;
+      device.disconnectedAt = new Date().toISOString();
+      connectedDevices.set(socket.id, device);
+      
+      // After a delay, remove the device completely if it doesn't reconnect
+      setTimeout(() => {
+        if (connectedDevices.has(socket.id) && !connectedDevices.get(socket.id).connected) {
+          connectedDevices.delete(socket.id);
+          // Notify clients that device is gone
+          io.emit('deviceUpdate', Array.from(connectedDevices.values()));
+        }
+      }, 300000); // Remove after 5 minutes of disconnection
+      
+      // Immediately notify clients of disconnection
+      io.emit('deviceUpdate', Array.from(connectedDevices.values()));
+    }
   });
 });
 
