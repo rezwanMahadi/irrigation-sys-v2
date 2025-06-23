@@ -1,0 +1,16 @@
+{
+  "name": "irrigation-control-server",
+  "version": "1.0.0",
+  "description": "Socket.IO server for irrigation control system",
+  "main": "heroku-server.js",
+  "scripts": {
+    "start": "node heroku-server.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "engines": {
+    "node": "18.x"
+  },
+  "dependencies": {
+    "socket.io": "^4.8.1"
+  }
+} 
