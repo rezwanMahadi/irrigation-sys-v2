@@ -15,6 +15,7 @@ const server = http.createServer((req, res) => {
 // Store the current LED state
 let ledState = false;
 let pinState = false;
+let pumpMode = false;
 // Track connected ESP32 devices
 const connectedDevices = new Map();
 
@@ -84,6 +85,15 @@ io.on('connection', (socket) => {
     }
     // Broadcast the updated state to all clients
     io.emit('controllingStatus', ledState, selectedPumpMode);
+  });
+
+  socket.on('togglePumpMode', (state) => {
+    console.log('Pump mode update from website:', state);
+    if (pumpMode !== state) {
+      pumpMode = state;
+    }
+    // Broadcast the updated state to all clients
+    io.emit('selectedPumpMode', pumpMode);
   });
 
   socket.on('sensorsData_controllingStatus', (sensorsValue) => {
