@@ -76,13 +76,14 @@ io.on('connection', (socket) => {
   });
 
   // Handle LED status update from ESP32 (sync state)
-  socket.on('ledStatus', (state) => {
+  socket.on('controllingStatus', (state) => {
+    const { ledState, selectedPumpMode } = state;
     console.log('LED status update from device:', state);
     if (ledState !== state) {
-      ledState = state;
-      // Broadcast the updated state to all clients
-      io.emit('ledState', ledState);
+      ledState = ledState;
     }
+    // Broadcast the updated state to all clients
+    io.emit('controllingStatus', ledState, selectedPumpMode);
   });
 
   socket.on('sensorsData', (sensorsValue) => {
