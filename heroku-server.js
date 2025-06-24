@@ -2,7 +2,23 @@ const http = require('http');
 const { Server } = require('socket.io');
 const { PrismaClient } = require('@prisma/client');
 
-const prisma = new PrismaClient();
+// Ensure DATABASE_URL is set
+if (!process.env.DATABASE_URL) {
+  console.error('DATABASE_URL environment variable is not set!');
+  process.exit(1);
+}
+
+// Initialize Prisma Client with error handling
+let prisma;
+try {
+  prisma = new PrismaClient({
+    errorFormat: 'minimal',
+  });
+  console.log('Prisma client initialized successfully');
+} catch (error) {
+  console.error('Failed to initialize Prisma client:', error);
+  process.exit(1);
+}
 
 // Create HTTP server
 const server = http.createServer((req, res) => {
@@ -157,7 +173,21 @@ io.on('connection', (socket) => {
   });
 });
 
+// Clean up resources on process termination
+process.on('SIGTERM', async () => {
+  console.log('SIGTERM received, shutting down gracefully');
+  await prisma.$disconnect();
+  process.exit(0);
+});
+
+process.on('SIGINT', async () => {
+  console.log('SIGINT received, shutting down gracefully');
+  await prisma.$disconnect();
+  process.exit(0);
+});
+
 // Start the server
 server.listen(PORT, () => {
   console.log(`Heroku Socket.IO server running on port ${PORT}`);
+  console.log(`Database URL is ${process.env.DATABASE_URL ? 'set' : 'NOT SET'}`);
 }); 

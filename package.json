@@ -4,7 +4,7 @@
   "description": "Socket.IO server for irrigation control system",
   "main": "heroku-server.js",
   "scripts": {
-    "start": "node heroku-server.js",
+    "start": "npx prisma generate && node heroku-server.js",
     "test": "echo \"Error: no test specified\" && exit 1",
     "postinstall": "npx prisma generate"
   },
@@ -16,5 +16,8 @@
     "pg": "^8.11.3",
     "prisma": "^6.10.1",
     "socket.io": "^4.8.1"
+  },
+  "prisma": {
+    "schema": "prisma/schema.prisma"
   }
 } 
