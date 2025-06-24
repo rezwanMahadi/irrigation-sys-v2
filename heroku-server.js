@@ -86,11 +86,11 @@ io.on('connection', (socket) => {
     io.emit('controllingStatus', ledState, selectedPumpMode);
   });
 
-  socket.on('sensorsData', (sensorsValue) => {
-    const { soilMoisture, temperature, waterLevel } = sensorsValue;
-    console.log('sensors data update from device:', soilMoisture, temperature, waterLevel);
+  socket.on('sensorsData_controllingStatus', (sensorsValue) => {
+    const { soilMoisture, temperature, waterLevel, newLedState, selectedPumpMode } = sensorsValue;
+    console.log('sensors data update from device:', soilMoisture, temperature, waterLevel, newLedState, selectedPumpMode);
     // Broadcast the updated state to all clients
-    io.emit('sensorsData', soilMoisture, temperature, waterLevel);
+    io.emit('sensorsData_controllingStatus', soilMoisture, temperature, waterLevel, newLedState, selectedPumpMode);
   });
 
   socket.on('disconnect', () => {
