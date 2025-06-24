@@ -1,5 +1,8 @@
 const http = require('http');
 const { Server } = require('socket.io');
+const { PrismaClient } = require('@prisma/client');
+
+const prisma = new PrismaClient();
 
 // Create HTTP server
 const server = http.createServer((req, res) => {
@@ -21,6 +24,23 @@ const connectedDevices = new Map();
 
 // Use the port provided by Heroku
 const PORT = process.env.PORT || 3001;
+
+// Function to save sensor data to the database
+async function saveSensorData(data, deviceId) {
+  try {
+    await prisma.sensorData.create({
+      data: {
+        temperature: data.temperature,
+        soilMoisture: data.soilMoisture,
+        waterLevel: data.waterLevel,
+        deviceId: deviceId || 'unknown'
+      }
+    });
+    console.log('Sensor data saved to database');
+  } catch (error) {
+    console.error('Error saving sensor data:', error);
+  }
+}
 
 // Create Socket.IO server with CORS enabled
 const io = new Server(server, {
@@ -99,6 +119,15 @@ io.on('connection', (socket) => {
   socket.on('sensorsData_controllingStatus', (sensorsValue) => {
     const { soilMoisture, temperature, waterLevel, newLedState, selectedPumpMode } = sensorsValue;
     console.log('sensors data update from device:', soilMoisture, temperature, waterLevel, newLedState, selectedPumpMode);
+    
+    // Save sensor data to database
+    const deviceId = connectedDevices.has(socket.id) ? connectedDevices.get(socket.id).deviceId : 'unknown';
+    saveSensorData({ 
+      temperature, 
+      soilMoisture, 
+      waterLevel 
+    }, deviceId);
+    
     // Broadcast the updated state to all clients
     io.emit('sensorsData_controllingStatus', soilMoisture, temperature, waterLevel, newLedState, selectedPumpMode);
   });

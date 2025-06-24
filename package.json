@@ -5,12 +5,16 @@
   "main": "heroku-server.js",
   "scripts": {
     "start": "node heroku-server.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "postinstall": "npx prisma generate"
   },
   "engines": {
     "node": "18.x"
   },
   "dependencies": {
+    "@prisma/client": "^6.10.1",
+    "pg": "^8.11.3",
+    "prisma": "^6.10.1",
     "socket.io": "^4.8.1"
   }
 } 
