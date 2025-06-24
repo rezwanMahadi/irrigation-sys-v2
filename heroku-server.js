@@ -86,10 +86,10 @@ io.on('connection', (socket) => {
   });
 
   socket.on('sensorsData', (sensorsValue) => {
-    const { soilMoisture, temperature } = sensorsValue;
-    console.log('sensors data update from device:', soilMoisture, temperature);
+    const { soilMoisture, temperature, waterLevel } = sensorsValue;
+    console.log('sensors data update from device:', soilMoisture, temperature, waterLevel);
     // Broadcast the updated state to all clients
-    io.emit('sensorsData', soilMoisture, temperature);
+    io.emit('sensorsData', soilMoisture, temperature, waterLevel);
   });
 
   socket.on('disconnect', () => {
