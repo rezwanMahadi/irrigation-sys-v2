@@ -36,6 +36,8 @@ let ledState = false;
 let pinState = false;
 let pumpMode = false;
 let reservoir1 = false;
+let reservoir2 = false;
+let drainageStatus = false;
 // Track connected ESP32 devices
 const connectedDevices = new Map();
 
@@ -75,7 +77,8 @@ io.on('connection', (socket) => {
   // Send current LED state to newly connected client
   socket.emit('ledState', ledState);
   socket.emit('reservoir1State', reservoir1);
-
+  socket.emit('reservoir2State', reservoir2);
+  socket.emit('drainageStatus', drainageStatus);
   // Send current connected devices to newly connected client
   socket.emit('connectedDevices', Array.from(connectedDevices.values()));
 
@@ -141,6 +144,24 @@ io.on('connection', (socket) => {
     }
     // Broadcast the updated state to all clients
     io.emit('reservoir1State', reservoir1);
+  });
+
+  socket.on('toggleReservoir2', (state) => {
+    console.log('Reservoir 2 state update from website:', state);
+    if (reservoir2 !== state) {
+      reservoir2 = state;
+    }
+    // Broadcast the updated state to all clients
+    io.emit('reservoir2State', reservoir2);
+  });
+
+  socket.on('toggleDrainage', (state) => {
+    console.log('Drainage state update from website:', state);
+    if (drainageStatus !== state) {
+      drainageStatus = state;
+    }
+    // Broadcast the updated state to all clients
+    io.emit('drainageStatus', drainageStatus);
   });
 
   socket.on('sensorsData_controllingStatus', (sensorsValue) => {
