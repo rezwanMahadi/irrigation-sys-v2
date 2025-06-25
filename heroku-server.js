@@ -164,7 +164,10 @@ io.on('connection', (socket) => {
   socket.on('setLimit', async (soilMoistureUpperLimit, soilMoistureLowerLimit, waterLevelLimit) => {
     console.log('Set limit from website:', soilMoistureUpperLimit, soilMoistureLowerLimit, waterLevelLimit);
     // Save the limit to the database
-    await prisma.limit.create({
+    await prisma.limit.update({
+      where: {
+        id: 11
+      },
       data: {
         soilMoistureUpperLimit,
         soilMoistureLowerLimit,
