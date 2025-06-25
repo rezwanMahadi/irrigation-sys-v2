@@ -49,7 +49,7 @@ async function saveSensorData(data, deviceId) {
     // Create a date with GMT+6 offset
     const now = new Date();
     const offsetHours = 6; // GMT+6
-    now.setHours(now.getHours() + offsetHours);
+    now.setHours(now.getHours());
 
     await prisma.sensorData.create({
       data: {
