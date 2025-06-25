@@ -24,3 +24,10 @@ model SensorData {
 
   @@index([createdAt])
 }
+
+model limit {
+  id Int @id @default(autoincrement())
+  soilMoistureUpperLimit Int
+  soilMoistureLowerLimit Int
+  waterLevelLimit Int
+}
