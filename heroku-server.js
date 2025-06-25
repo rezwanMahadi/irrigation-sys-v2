@@ -129,7 +129,7 @@ io.on('connection', (socket) => {
     if (pumpMode !== state) {
       pumpMode = state;
     }
-    // Broadcast the updated state to all clients
+    // Broadcast the updated state to all  clients
     io.emit('selectedPumpMode', pumpMode);
   });
 
