@@ -1,1 +1,1 @@
-web: npx prisma generate && node heroku-server.js 
+web: npx prisma generate --no-engine && node heroku-server.js 
