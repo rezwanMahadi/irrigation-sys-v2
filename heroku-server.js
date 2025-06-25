@@ -131,8 +131,16 @@ io.on('connection', (socket) => {
     if (pumpMode !== state) {
       pumpMode = state;
     }
+    if (reservoir1 === true && pumpMode === true) {
+      reservoir1 = false;
+    }
+    if (reservoir2 === true && pumpMode === true) {
+      reservoir2 = false;
+    }
     // Broadcast the updated state to all  clients
     io.emit('selectedPumpMode', pumpMode);
+    io.emit('reservoir1State', reservoir1);
+    io.emit('reservoir2State', reservoir2);
   });
 
   socket.on('toggleReservoir1', (state) => {
