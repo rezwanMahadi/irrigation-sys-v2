@@ -161,6 +161,19 @@ io.on('connection', (socket) => {
     io.emit('reservoir2State', reservoir2);
   });
 
+  socket.on('setLimit', async (soilMoistureUpperLimit, soilMoistureLowerLimit, waterLevelLimit) => {
+    console.log('Set limit from website:', soilMoistureUpperLimit, soilMoistureLowerLimit, waterLevelLimit);
+    // Save the limit to the database
+    await prisma.limit.create({
+      data: {
+        soilMoistureUpperLimit,
+        soilMoistureLowerLimit,
+        waterLevelLimit
+      }
+    });
+    io.emit('setLimit', soilMoistureUpperLimit, soilMoistureLowerLimit, waterLevelLimit);
+  });
+
   socket.on('sensorsData_controllingStatus', (sensorsValue) => {
     const { soilMoisture, temperature, waterLevel, newLedState, selectedPumpMode } = sensorsValue;
     console.log('sensors data update from device:', soilMoisture, temperature, waterLevel, newLedState, selectedPumpMode);
