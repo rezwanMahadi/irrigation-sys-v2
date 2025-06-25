@@ -46,15 +46,21 @@ const PORT = process.env.PORT || 3001;
 // Function to save sensor data to the database
 async function saveSensorData(data, deviceId) {
   try {
+    // Create a date with GMT+6 offset
+    const now = new Date();
+    const offsetHours = 6; // GMT+6
+    now.setHours(now.getHours() + offsetHours);
+
     await prisma.sensorData.create({
       data: {
         temperature: data.temperature,
         soilMoisture: data.soilMoisture,
         waterLevel: data.waterLevel,
-        deviceId: deviceId || 'unknown'
+        deviceId: deviceId || 'unknown',
+        createdAt: now // Set the timestamp with GMT+6 offset
       }
     });
-    console.log('Sensor data saved to database');
+    console.log('Sensor data saved to database with GMT+6 timestamp');
   } catch (error) {
     console.error('Error saving sensor data:', error);
   }
