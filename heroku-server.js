@@ -74,6 +74,7 @@ io.on('connection', (socket) => {
 
   // Send current LED state to newly connected client
   socket.emit('ledState', ledState);
+  socket.emit('reservoir1State', reservoir1);
 
   // Send current connected devices to newly connected client
   socket.emit('connectedDevices', Array.from(connectedDevices.values()));
