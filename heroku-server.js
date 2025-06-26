@@ -246,7 +246,7 @@ process.on('SIGINT', async () => {
   process.exit(0);
 });
 
-// Start the server
+// Start the server 
 server.listen(PORT, () => {
   console.log(`Heroku Socket.IO server running on port ${PORT}`);
   console.log(`Database URL is ${process.env.DATABASE_URL ? 'set' : 'NOT SET'}`);
