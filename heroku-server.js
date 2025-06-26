@@ -37,6 +37,9 @@ let pinState = false;
 let pumpMode = false;
 let reservoir1 = false;
 let reservoir2 = false;
+let soilMoistureUpperLimit = 0;
+let soilMoistureLowerLimit = 0;
+let waterLevelLimit = 0;
 // Track connected ESP32 devices
 const connectedDevices = new Map();
 
@@ -83,6 +86,9 @@ io.on('connection', (socket) => {
   socket.emit('ledState', ledState);
   socket.emit('reservoir1State', reservoir1);
   socket.emit('reservoir2State', reservoir2);
+  socket.emit('soilMoistureUpperLimit', soilMoistureUpperLimit);
+  socket.emit('soilMoistureLowerLimit', soilMoistureLowerLimit);
+  socket.emit('waterLevelLimit', waterLevelLimit);
   // Send current connected devices to newly connected client
   socket.emit('connectedDevices', Array.from(connectedDevices.values()));
 
@@ -167,8 +173,11 @@ io.on('connection', (socket) => {
     io.emit('reservoir2State', reservoir2);
   });
 
-  socket.on('setLimit', async (soilMoistureUpperLimit, soilMoistureLowerLimit, waterLevelLimit) => {
-    console.log('Set limit from website:', soilMoistureUpperLimit, soilMoistureLowerLimit, waterLevelLimit);
+  socket.on('setNewLimit', async (newSoilMoistureUpperLimit, newSoilMoistureLowerLimit, newWaterLevelLimit) => {
+    console.log('Set limit from website:', newSoilMoistureUpperLimit, newSoilMoistureLowerLimit, newWaterLevelLimit);
+    soilMoistureUpperLimit = newSoilMoistureUpperLimit;
+    soilMoistureLowerLimit = newSoilMoistureLowerLimit;
+    waterLevelLimit = newWaterLevelLimit;
     // Save the limit to the database
     await prisma.limit.update({
       where: {
@@ -180,7 +189,7 @@ io.on('connection', (socket) => {
         waterLevelLimit
       }
     });
-    io.emit('setLimit', soilMoistureUpperLimit, soilMoistureLowerLimit, waterLevelLimit);
+    io.emit('setNewLimit', soilMoistureUpperLimit, soilMoistureLowerLimit, waterLevelLimit);
   });
 
   socket.on('sensorsData_controllingStatus', (sensorsValue) => {
