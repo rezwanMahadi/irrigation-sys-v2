@@ -86,9 +86,6 @@ io.on('connection', (socket) => {
   socket.emit('ledState', ledState);
   socket.emit('reservoir1State', reservoir1);
   socket.emit('reservoir2State', reservoir2);
-  socket.emit('soilMoistureUpperLimit', soilMoistureUpperLimit);
-  socket.emit('soilMoistureLowerLimit', soilMoistureLowerLimit);
-  socket.emit('waterLevelLimit', waterLevelLimit);
   // Send current connected devices to newly connected client
   socket.emit('connectedDevices', Array.from(connectedDevices.values()));
 
